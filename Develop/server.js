@@ -5,20 +5,24 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-const allNotes = requirer('./db/db.json');
+const allNotes = require('./db/db.json');
 
 // Set up body parsing, static, and route middleware
-app.use(express.urlencoded({ extend:true }));
 app.use(express.json());
+app.use(express.urlencoded({ extended:true }));
 app.use(express.static('public'));
 
 //GET API
+app.get('/notes', (req, res) => {
+  res.sendFile(path.join(__dirname, '/public/notes.html'));
+});
+
 app.get('/api/notes',(req, res) => {
   res.json(allNotes.slice(1));
 });
 
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, './Develop/public/index.html'));
+  res.sendFile(path.join(__dirname, '/public/index.html'));
 });
 
 function createNewNote (body, notesArray) {
@@ -35,13 +39,13 @@ function createNewNote (body, notesArray) {
   notesArray.push(newNote);
   fs.writeFileSync(
     path.join(__dirname, './db/db.json'),
-    JSON.stringify(noteArray, null, 2)
+    JSON.stringify(notesArray, null, 2)
   );
   return newNote;
 }
 
 //POST api
-app.post('api/notes', (req,res) => {
+app.post('/api/notes', (req,res) => {
   const newNote = createNewNote(req.body, allNotes);
   res.json(newNote);
 });
